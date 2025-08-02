@@ -1,21 +1,21 @@
 import { Container } from '@/components';
 import Layout from '@/components/layout';
-import QuoteCardContainer from '@/components/cards/QuoteCardContainer';
+import { CosineTerrainCard } from '@/components/cards';
 
 export default function Home() {
   return (
     <Layout>
       {/* Hero */}
       <Container className="pt-20 pb-10 text-center space-y-4">
-        <h1 className="text-5xl font-bold">Next.js Starter Template</h1>
+        <h1 className="text-5xl font-bold">3D Cosine Terrain Demo</h1>
         <p className="text-muted-foreground text-lg">
-          Minimal starter built with Tailwind CSS v4 and ShadCN.
+          Experience an infinite cosine surface rendered in retro wireframe.
         </p>
       </Container>
 
-      {/* Sample Content */}
+      {/* Cosine Terrain Demo */}
       <Container className="pb-20">
-        <QuoteCardContainer slug="sample-quote" />
+        <CosineTerrainCard className="w-full h-[600px]" />
       </Container>
     </Layout>
   );

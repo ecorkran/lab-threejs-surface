@@ -19,9 +19,9 @@
 
 ## Component Structure & Foundation
 
-- [ ] **Create CosineTerrainCard component file**
-  - [ ] Create new file: `src/components/cards/CosineTerrainCard.tsx`
-  - [ ] Set up basic React functional component structure
+- [x] **Create CosineTerrainCard component file**
+  - [x] Create new file: `src/components/cards/CosineTerrainCard.tsx`
+  - [x] Set up basic React functional component structure
     ```typescript
     "use client";
     
@@ -37,19 +37,19 @@
     
     export default CosineTerrainCard;
     ```
-  - [ ] Success: Component file created with proper TypeScript interface
+  - [x] Success: Component file created with proper TypeScript interface
 
-- [ ] **Copy ThreeJSCard foundation patterns**
-  - [ ] Review existing `src/components/cards/ThreeJSCard.tsx` for patterns
-  - [ ] Copy canvas setup, theme integration, and cleanup patterns
-  - [ ] Adapt useEffect structure for terrain-specific logic
-  - [ ] Copy resize handling and WebGL renderer setup
-  - [ ] Success: Component has solid Three.js foundation without breaking existing ThreeJSCard
+- [x] **Copy ThreeJSCard foundation patterns**
+  - [x] Review existing `src/components/cards/ThreeJSCard.tsx` for patterns
+  - [x] Copy canvas setup, theme integration, and cleanup patterns
+  - [x] Adapt useEffect structure for terrain-specific logic
+  - [x] Copy resize handling and WebGL renderer setup
+  - [x] Success: Component has solid Three.js foundation without breaking existing ThreeJSCard
 
-- [ ] **Add component to cards index**
-  - [ ] Open `src/components/cards/index.ts`
-  - [ ] Add export line: `export { default as CosineTerrainCard } from './CosineTerrainCard';`
-  - [ ] Success: Component properly exported and available for import
+- [x] **Add component to cards index**
+  - [x] Open `src/components/cards/index.ts`
+  - [x] Add export line: `export { default as CosineTerrainCard } from './CosineTerrainCard';`
+  - [x] Success: Component properly exported and available for import
 
 ## Terrain Generation System
 

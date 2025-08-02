@@ -13,3 +13,4 @@ export { default as ProjectFeatureCard } from './ProjectFeatureCard';
 export { default as ComingSoonFeatureCard } from './ComingSoonFeatureCard';
 export { default as GuidesFeatureCard } from './GuidesFeatureCard';
 export { default as ThreeJSCard } from './ThreeJSCard';
+export { default as CosineTerrainCard } from './CosineTerrainCard';
