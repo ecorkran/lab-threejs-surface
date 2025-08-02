@@ -33,6 +33,8 @@ interface CosineTerrainCardProps {
   heightVariationFrequency?: number;
   // Terrain quality system
   terrainQuality?: 0 | 1 | 2;
+  // Dynamic tile count
+  enableDynamicTilesX?: boolean;
 }
 
 const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
@@ -63,14 +65,28 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   heightVariation = 0,
   heightVariationFrequency = 0.25,
   terrainQuality = 2,
+  enableDynamicTilesX = true,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   // Tile management constants (maintainability)
-  const TILE_RECYCLING_THRESHOLD = 0.75; // How far behind camera before recycling (in tile units)
+  const TILE_RECYCLING_THRESHOLD = 1.5; // How far behind camera before recycling (in tile units) - increased to prevent premature clipping
   const TILE_BUFFER_DISTANCE = 1.5; // Extra tiles to keep in front of camera (in tile units)
   const GAP_DETECTION_ENABLED = true; // Enable gap detection and emergency tile creation
   const MAX_TILES_PER_FRAME_RECYCLE = 2; // Limit recycling operations per frame for performance
+  
+  // Dynamic tile calculation constants
+  const TILE_BUFFER_COUNT = 10; // Extra tiles for safety margin (wider coverage for distance viewing)
+  const MINIMUM_TILES_X = 8; // Minimum horizontal tiles regardless of viewport
+  
+  /**
+   * Calculate optimal horizontal tile count based on viewport and camera settings
+   */
+  const calculateOptimalTilesX = (viewportWidth: number): number => {
+    const viewWidth = 2 * Math.tan((fov * Math.PI / 180) / 2) * cameraHeight;
+    const tilesNeeded = Math.ceil(viewWidth / terrainScale);
+    return Math.max(tilesNeeded + TILE_BUFFER_COUNT, MINIMUM_TILES_X);
+  };
   
   // Frequency validation for gap prevention
   const validateTerrainFrequency = (frequency: number): void => {
@@ -94,15 +110,20 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   useEffect(() => {
     if (!mountRef.current) return;
 
+    // Calculate actual tilesX to use (Step 3)
+    const actualTilesX = enableDynamicTilesX 
+      ? calculateOptimalTilesX(mountRef.current.clientWidth)
+      : tilesX;
+
     const cameraFarPlane = 20000;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, cameraFarPlane);
+    const camera = new THREE.PerspectiveCamera(fov, mountRef.current.clientWidth / mountRef.current.clientHeight, 1, cameraFarPlane);
     camera.position.y = cameraHeight;
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     
     // Depth testing is enabled by default in Three.js WebGLRenderer
     mountRef.current.appendChild(renderer.domElement);
@@ -232,9 +253,9 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       geometry.computeVertexNormals();
     };
 
-    for (let i = 0; i < tilesX; i++) {
+    for (let i = 0; i < actualTilesX; i++) {
       for (let j = 0; j < tilesZ; j++) {
-        terrainTiles.push(generateTerrainTile(i - Math.floor(tilesX / 2), j - Math.floor(tilesZ / 2)));
+        terrainTiles.push(generateTerrainTile(i - Math.floor(actualTilesX / 2), j - Math.floor(tilesZ / 2)));
       }
     }
 
@@ -322,9 +343,10 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     };
 
     const onWindowResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      if (!mountRef.current) return;
+      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     };
 
     window.addEventListener('resize', onWindowResize);
@@ -413,15 +435,21 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         
         // Recycle tiles that are well behind the camera
         const recycleThreshold = terrainScale * TILE_RECYCLING_THRESHOLD;
-        if (camera.position.z < tile.position.z - recycleThreshold) {
-          const newTileZ = tile.position.z - terrainScale * tilesZ;
+        const distanceBehindCamera = tile.position.z - camera.position.z;
+        
+        if (distanceBehindCamera > recycleThreshold) {
+          // Move tile forward by the full terrain depth to maintain grid structure
+          const newTileZ = tile.position.z - (terrainScale * tilesZ);
+          
+
+          
           tile.position.z = newTileZ;
           recycledThisFrame++;
           
           // Quality 2: Regenerate geometry for true continuous terrain
           if (terrainQuality >= 2) {
-            const tileX = tile.position.x / terrainScale;
-            const tileZ = newTileZ / terrainScale;
+            const tileX = tile.position.x / terrainScale; // Keep existing X coordinate
+            const tileZ = newTileZ / terrainScale; // Use new Z coordinate
             regenerateTileGeometry(tile, tileX, tileZ);
           }
         }
@@ -444,7 +472,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, enableDynamicTilesX, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality]);
 
   return <div ref={mountRef} className={className} />;
 };
