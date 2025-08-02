@@ -12,30 +12,32 @@ interface CosineTerrainCardProps {
   meshResolution?: number;
   tilesX?: number;
   tilesZ?: number;
+  fov?: number;
+  terrainScale?: number;
 }
 
 const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   className,
   seed = 0,
-  speed = 2500,
-  cameraHeight = 2800,
-  terrainFrequency = 0.04,
-  terrainAmplitude = 196,
-  meshResolution = 16,
-  tilesX = 16,
-  tilesZ = 15,
+  speed = 4200,
+  cameraHeight = 1800,
+  terrainFrequency = 0.0002,
+  terrainAmplitude = 3800,
+  meshResolution = 8,
+  tilesX = 20,
+  tilesZ = 32,
+  fov = 60,
+  terrainScale = 2024,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
 
-    const terrainSize = 2000;
-    const worldWidth = meshResolution, worldDepth = meshResolution;
     const cameraFarPlane = 20000;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, cameraFarPlane);
+    const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 1, cameraFarPlane);
     camera.position.y = cameraHeight;
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
@@ -47,28 +49,34 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     const terrainTiles: THREE.Mesh[] = [];
 
     const generateTerrainTile = (tileX: number, tileZ: number) => {
-      const geometry = new THREE.PlaneGeometry(terrainSize, terrainSize, worldWidth - 1, worldDepth - 1);
+      const geometry = new THREE.PlaneGeometry(terrainScale, terrainScale, meshResolution - 1, meshResolution - 1);
       geometry.rotateX(-Math.PI / 2);
-      const position = geometry.attributes.position as THREE.BufferAttribute;
-      position.usage = THREE.DynamicDrawUsage;
+      
+      const positions = geometry.attributes.position as THREE.BufferAttribute;
+      const vertex = new THREE.Vector3();
 
-      const halfWorldWidth = worldWidth / 2;
-      for (let i = 0; i < position.count; i++) {
-        const x = (i % worldWidth) + tileX * (worldWidth -1);
-        const z = Math.floor(i / worldWidth) + tileZ * (worldDepth - 1);
-        const y = (Math.cos(x * terrainFrequency + seed) * Math.cos(z * terrainFrequency + seed) * halfWorldWidth + halfWorldWidth) * terrainAmplitude;
-        position.setY(i, y);
+      for (let i = 0; i < positions.count; i++) {
+        vertex.fromBufferAttribute(positions, i);
+
+        const worldX = vertex.x + tileX * terrainScale;
+        const worldZ = vertex.z + tileZ * terrainScale;
+
+        const y = Math.cos(worldX * terrainFrequency + seed) * Math.cos(worldZ * terrainFrequency + seed) * terrainAmplitude;
+        positions.setY(i, y);
       }
       
+      positions.needsUpdate = true;
+      geometry.computeVertexNormals();
+
       const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(tileX * terrainSize, 0, tileZ * terrainSize);
+      mesh.position.set(tileX * terrainScale, 0, tileZ * terrainScale);
       scene.add(mesh);
       return mesh;
     };
 
     for (let i = 0; i < tilesX; i++) {
       for (let j = 0; j < tilesZ; j++) {
-        terrainTiles.push(generateTerrainTile(i - tilesX / 2, j - tilesZ / 2));
+        terrainTiles.push(generateTerrainTile(i - Math.floor(tilesX / 2), j - Math.floor(tilesZ / 2)));
       }
     }
 
@@ -90,8 +98,8 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       camera.position.z -= delta * speed; 
 
       terrainTiles.forEach(tile => {
-        if (camera.position.z < tile.position.z - terrainSize / 2) {
-            tile.position.z -= terrainSize * tilesZ;
+        if (camera.position.z < tile.position.z - terrainScale / 2) {
+            tile.position.z -= terrainScale * tilesZ;
             // We would regenerate the tile geometry here for true continuous terrain
         }
       });
@@ -107,7 +115,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale]);
 
   return <div ref={mountRef} className={className} />;
 };
