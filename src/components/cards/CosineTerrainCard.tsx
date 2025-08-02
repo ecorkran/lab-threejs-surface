@@ -1,114 +1,115 @@
 "use client";
-
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { calculateTerrainHeight } from '@/lib/utils/terrainMath';
-import { useTheme } from '@/context/themecontext';
-import { useTerrainGenerator } from '@/hooks/useTerrainGenerator';
 
-export interface CosineTerrainCardProps {
+interface CosineTerrainCardProps {
   className?: string;
+  seed?: number;
   speed?: number;
-  surfaceDetail?: number;
-  waveFrequency?: number;
-  height?: number;
+  cameraHeight?: number;
+  terrainFrequency?: number;
+  terrainAmplitude?: number;
+  meshResolution?: number;
+  tilesX?: number;
+  tilesZ?: number;
 }
 
 const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
-  className = '',
-  speed = 1.0,
-  surfaceDetail = 1,
-  waveFrequency = 1.0,
-  height = 30
+  className,
+  seed = 0,
+  speed = 2500,
+  cameraHeight = 2800,
+  terrainFrequency = 0.04,
+  terrainAmplitude = 196,
+  meshResolution = 16,
+  tilesX = 16,
+  tilesZ = 15,
 }) => {
-  const { theme } = useTheme();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const planeSize = 200;
-  const planeSegments = 200;
-  // Generate smoother terrain: lower frequency and reduced amplitude
-  const smoothFreq = waveFrequency * 0.1;
-  const smoothAmp = height * 0.1;
-  const geometry = useTerrainGenerator(planeSize, planeSegments, smoothFreq, smoothAmp);
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (!geometry) return;
+    if (!mountRef.current) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    const bgColor = theme === 'dark' ? 0x000000 : 0xffffff;
-    renderer.setClearColor(bgColor);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    const terrainSize = 2000;
+    const worldWidth = meshResolution, worldDepth = meshResolution;
+    const cameraFarPlane = 20000;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(bgColor);
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, cameraFarPlane);
+    camera.position.y = cameraHeight;
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mountRef.current.appendChild(renderer.domElement);
 
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      canvas.clientWidth / canvas.clientHeight,
-      0.1,
-      1000
-    );
-    // Start at left edge of terrain
-    camera.position.set(-planeSize / 2, height, 0);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    const terrainTiles: THREE.Mesh[] = [];
 
-    // Terrain geometry
-    const material = new THREE.MeshBasicMaterial({
-      color: theme === 'dark' ? 0x00ff00 : 0x000000,
-      wireframe: true,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    // Position mesh centered
-    mesh.position.set(0, 0, 0);
-    mesh.rotation.x = -Math.PI / 2;
-    scene.add(mesh);
+    const generateTerrainTile = (tileX: number, tileZ: number) => {
+      const geometry = new THREE.PlaneGeometry(terrainSize, terrainSize, worldWidth - 1, worldDepth - 1);
+      geometry.rotateX(-Math.PI / 2);
+      const position = geometry.attributes.position as THREE.BufferAttribute;
+      position.usage = THREE.DynamicDrawUsage;
 
-    const clock = new THREE.Clock();
-    let animationId: number;
-    const animate = () => {
-      const delta = clock.getDelta();
-      // Move camera forward along X axis
-      camera.position.x += delta * speed;
-
-      // Sample terrain height at camera X,Z position
-      const terrainY = calculateTerrainHeight(
-        camera.position.x,
-        camera.position.z,
-        waveFrequency,
-        height
-      );
-
-      // Smooth camera Y to follow terrain without sharp jumps
-      const targetY = terrainY + height;
+      const halfWorldWidth = worldWidth / 2;
+      for (let i = 0; i < position.count; i++) {
+        const x = (i % worldWidth) + tileX * (worldWidth -1);
+        const z = Math.floor(i / worldWidth) + tileZ * (worldDepth - 1);
+        const y = (Math.cos(x * terrainFrequency + seed) * Math.cos(z * terrainFrequency + seed) * halfWorldWidth + halfWorldWidth) * terrainAmplitude;
+        position.setY(i, y);
+      }
       
-      // Small lerp factor for gentle motion (never drops below surface)
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.02);
-      camera.lookAt(camera.position.x + 1, camera.position.y, camera.position.z);
-      renderer.render(scene, camera);
-      animationId = requestAnimationFrame(animate);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(tileX * terrainSize, 0, tileZ * terrainSize);
+      scene.add(mesh);
+      return mesh;
     };
+
+    for (let i = 0; i < tilesX; i++) {
+      for (let j = 0; j < tilesZ; j++) {
+        terrainTiles.push(generateTerrainTile(i - tilesX / 2, j - tilesZ / 2));
+      }
+    }
+
+    const onWindowResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener('resize', onWindowResize);
+
+    let lastTime = performance.now();
+    const animate = () => {
+      requestAnimationFrame(animate);
+      const now = performance.now();
+      const delta = (now - lastTime) / 1000;
+      lastTime = now;
+      
+      camera.position.z -= delta * speed; 
+
+      terrainTiles.forEach(tile => {
+        if (camera.position.z < tile.position.z - terrainSize / 2) {
+            tile.position.z -= terrainSize * tilesZ;
+            // We would regenerate the tile geometry here for true continuous terrain
+        }
+      });
+
+      renderer.render(scene, camera);
+    };
+
     animate();
 
-    const handleResize = () => {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      renderer.setSize(width, height, false);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
     return () => {
-      cancelAnimationFrame(animationId);
-      material.dispose();
-      renderer.dispose();
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', onWindowResize);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
     };
-  }, [theme, geometry]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution]);
 
-  return <canvas ref={canvasRef} className={`${className} w-full h-full block`} />;
+  return <div ref={mountRef} className={className} />;
 };
 
 export default CosineTerrainCard;
