@@ -14,6 +14,9 @@ interface CosineTerrainCardProps {
   tilesZ?: number;
   fov?: number;
   terrainScale?: number;
+  hiddenLineRemoval?: boolean;
+  terrainEquation?: 'multiplicative' | 'additive';
+  showFPS?: boolean;
 }
 
 const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
@@ -23,11 +26,14 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   cameraHeight = 1800,
   terrainFrequency = 0.0002,
   terrainAmplitude = 3800,
-  meshResolution = 8,
+  meshResolution = 12,
   tilesX = 20,
   tilesZ = 32,
   fov = 60,
-  terrainScale = 2024,
+  terrainScale = 2048,
+  hiddenLineRemoval = false,
+  terrainEquation = 'additive',
+  showFPS = true,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -43,9 +49,27 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    // Depth testing is enabled by default in Three.js WebGLRenderer
     mountRef.current.appendChild(renderer.domElement);
 
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    // Create material based on hidden line removal setting
+    const material = hiddenLineRemoval 
+      ? new THREE.MeshBasicMaterial({ 
+          color: 0x00ff00, 
+          wireframe: true,
+          side: THREE.FrontSide,
+          transparent: false,
+          depthTest: true,
+          depthWrite: true
+        })
+      : new THREE.MeshBasicMaterial({ 
+          color: 0x00ff00, 
+          wireframe: true,
+          depthTest: false,
+          depthWrite: false
+        });
+    
     const terrainTiles: THREE.Mesh[] = [];
 
     const generateTerrainTile = (tileX: number, tileZ: number) => {
@@ -61,7 +85,9 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         const worldX = vertex.x + tileX * terrainScale;
         const worldZ = vertex.z + tileZ * terrainScale;
 
-        const y = Math.cos(worldX * terrainFrequency + seed) * Math.cos(worldZ * terrainFrequency + seed) * terrainAmplitude;
+        const y = terrainEquation === 'additive'
+          ? (Math.cos(worldX * terrainFrequency + seed) + Math.cos(worldZ * terrainFrequency + seed)) * terrainAmplitude * 0.5
+          : Math.cos(worldX * terrainFrequency + seed) * Math.cos(worldZ * terrainFrequency + seed) * terrainAmplitude;
         positions.setY(i, y);
       }
       
@@ -88,12 +114,46 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
 
     window.addEventListener('resize', onWindowResize);
 
+    // FPS tracking
+    let frameCount = 0;
+    let fpsLastTime = performance.now();
+    let currentFPS = 0;
+    let fpsElement: HTMLDivElement | null = null;
+    
+    if (showFPS) {
+      fpsElement = document.createElement('div');
+      fpsElement.style.position = 'absolute';
+      fpsElement.style.top = '10px';
+      fpsElement.style.left = '10px';
+      fpsElement.style.color = '#00ff00';
+      fpsElement.style.fontFamily = 'monospace';
+      fpsElement.style.fontSize = '16px';
+      fpsElement.style.backgroundColor = 'rgba(0,0,0,0.7)';
+      fpsElement.style.padding = '5px';
+      fpsElement.style.borderRadius = '3px';
+      fpsElement.style.zIndex = '1000';
+      fpsElement.textContent = 'FPS: --';
+      mountRef.current.style.position = 'relative';
+      mountRef.current.appendChild(fpsElement);
+    }
+
     let lastTime = performance.now();
     const animate = () => {
       requestAnimationFrame(animate);
       const now = performance.now();
       const delta = (now - lastTime) / 1000;
       lastTime = now;
+      
+      // FPS calculation
+      if (showFPS && fpsElement) {
+        frameCount++;
+        if (now - fpsLastTime >= 1000) {
+          currentFPS = Math.round((frameCount * 1000) / (now - fpsLastTime));
+          fpsElement.textContent = `FPS: ${currentFPS}`;
+          frameCount = 0;
+          fpsLastTime = now;
+        }
+      }
       
       camera.position.z -= delta * speed; 
 
@@ -112,10 +172,13 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     return () => {
       window.removeEventListener('resize', onWindowResize);
       if (mountRef.current) {
+        if (fpsElement) {
+          mountRef.current.removeChild(fpsElement);
+        }
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, hiddenLineRemoval, terrainEquation, showFPS]);
 
   return <div ref={mountRef} className={className} />;
 };
