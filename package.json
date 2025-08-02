@@ -28,6 +28,8 @@
     "ai-assisted-build": "pnpm ai-typecheck && pnpm lint && pnpm format:check && pnpm build",
     "ai-typecheck": "tsc --noEmit --skipLibCheck",
     "ai-lint": "eslint . --ext .ts,.tsx --fix",
+    "setup-cursor": "project-documents/scripts/setup-ide cursor",
+    "setup-windsurf": "project-documents/scripts/setup-ide windsurf",
     "ai-format": "prettier --write ."
   },
   "dependencies": {

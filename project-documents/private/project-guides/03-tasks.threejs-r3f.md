@@ -2,7 +2,7 @@
 
 ## Project Setup & Dependencies
 
-- [ ] **Install Three.js dependencies**
+- [x] **Install Three.js dependencies**
   - [ ] Install Three.js library for 3D graphics
     1. Run: `pnpm add three`
     2. Install TypeScript definitions: `pnpm add -D @types/three`
@@ -11,7 +11,7 @@
     2. Confirm no TypeScript errors in IDE
   - [ ] Success: Three.js library available and properly typed
 
-- [ ] **Add AI support scripts to package.json**
+- [x] **Add AI support scripts to package.json**
   - [ ] Locate `snippets/npm-scripts.ai-support.json` file
   - [ ] Copy scripts block from snippet file
   - [ ] Add scripts to existing `package.json` scripts section
