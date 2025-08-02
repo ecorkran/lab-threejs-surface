@@ -15,10 +15,20 @@ interface CosineTerrainCardProps {
   fov?: number;
   terrainScale?: number;
   terrainEquation?: 'multiplicative' | 'additive';
+  // Amplitude multipliers for both equations
+  // Additive: z = (xMult * cos(x) + zMult * cos(z)) * amplitude * 0.5
+  // Multiplicative: z = (xMult * cos(x)) * (zMult * cos(z)) * amplitude
+  xAmplitudeMultiplier?: number;
+  zAmplitudeMultiplier?: number;
+  // Spatial variation parameters
+  enableAmplitudeVariation?: boolean;
+  amplitudeVariationFrequency?: number; // How often amplitude varies across terrain
+  amplitudeVariationIntensity?: number; // How much amplitude can vary (0-1)
   showFPS?: boolean;
   // Enhanced camera system props
   followTerrain?: boolean;
   lookAheadDistance?: number; // Distance ahead to look at (0 = straight down, large = straight ahead)
+  lookAtHeight?: number; // Height above terrain to look at (0 = terrain surface, positive = above terrain)
   heightVariation?: number;
   heightVariationFrequency?: number;
   // Terrain quality system
@@ -29,19 +39,27 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   className,
   seed = 0,
   speed = 2400,
-  cameraHeight = 1600,
-  terrainFrequency = 0.000306,
+  cameraHeight = 3600,
+  terrainFrequency = 0.000153,
   terrainAmplitude = 2400,
   meshResolution = 12,
   tilesX = 20,
   tilesZ = 32,
   fov = 60,
   terrainScale = 2048,
-  terrainEquation = 'additive',
+  terrainEquation = 'multiplicative',
+  // Amplitude multipliers for both terrain equations
+  xAmplitudeMultiplier = 1.2,
+  zAmplitudeMultiplier = 1.0,
+  // Spatial variation settings
+  enableAmplitudeVariation = true,
+  amplitudeVariationFrequency = 0.000273, // low freq for fairly large-scale features
+  amplitudeVariationIntensity = 1.73, // Can vary amplitude by ±173%
   showFPS = true,
   // Enhanced camera system props with appropriate defaults
   followTerrain = true,
-  lookAheadDistance = 8192, // Distance ahead to look at (0 = straight down, large = straight ahead)
+  lookAheadDistance = 8100, // Distance ahead to look at (0 = straight down, large = straight ahead)
+  lookAtHeight = 1024, // Height above terrain to look at (0 = terrain surface)
   heightVariation = 0,
   heightVariationFrequency = 0.25,
   terrainQuality = 2,
@@ -139,12 +157,25 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       }
     };
 
-    // Terrain height calculation function (shared across quality levels)
-    const calculateTerrainHeight = (worldX: number, worldZ: number): number => {
-      return terrainEquation === 'additive'
-        ? (Math.cos(worldX * terrainFrequency + seed) + Math.cos(worldZ * terrainFrequency + seed)) * terrainAmplitude * 0.5
-        : Math.cos(worldX * terrainFrequency + seed) * Math.cos(worldZ * terrainFrequency + seed) * terrainAmplitude;
-    };
+      // Terrain height calculation function (shared across quality levels)
+      const calculateTerrainHeight = (worldX: number, worldZ: number): number => {
+        const cosX = Math.cos(worldX * terrainFrequency + seed);
+        const cosZ = Math.cos(worldZ * terrainFrequency + seed);
+        
+        // Calculate local amplitude variation
+        let localAmplitude = terrainAmplitude;
+        if (enableAmplitudeVariation) {
+          // Use low-frequency noise to vary amplitude across space
+          const amplitudeNoise = Math.sin(worldX * amplitudeVariationFrequency + seed * 0.7) * 
+                                 Math.cos(worldZ * amplitudeVariationFrequency + seed * 1.3);
+          const amplitudeVariationFactor = 1 + (amplitudeNoise * amplitudeVariationIntensity);
+          localAmplitude *= amplitudeVariationFactor;
+        }
+        
+        return terrainEquation === 'additive'
+          ? (xAmplitudeMultiplier * cosX + zAmplitudeMultiplier * cosZ) * localAmplitude * 0.5
+          : (xAmplitudeMultiplier * cosX) * (zAmplitudeMultiplier * cosZ) * localAmplitude;
+      };
 
     const generateTerrainTile = (tileX: number, tileZ: number) => {
       // Quality 1+: Use higher resolution for shared edges
@@ -358,11 +389,12 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         const lookAheadZ = camera.position.z - lookAheadDistance;
         const lookAheadTerrainHeight = sampleTerrainHeight(lookAheadX, lookAheadZ);
         
-        // Simply look at the terrain surface at the specified distance
+        // Look at point above terrain surface at the specified distance and height
         // Distance 0 = look straight down, large distance = look nearly straight ahead
+        // Height 0 = look at terrain, positive = look above terrain
         const lookAtPoint = new THREE.Vector3(
           lookAheadX,
-          lookAheadTerrainHeight,
+          lookAheadTerrainHeight + lookAtHeight,
           lookAheadZ
         );
         
@@ -412,7 +444,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, showFPS, followTerrain, lookAheadDistance, heightVariation, heightVariationFrequency, terrainQuality]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality]);
 
   return <div ref={mountRef} className={className} />;
 };
