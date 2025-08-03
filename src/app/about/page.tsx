@@ -18,7 +18,6 @@ const AboutPage: React.FC = () => {
             <p className="text-lg leading-relaxed">
               The <Link href="https://github.com/ecorkran/lab-threejs-surface" target="_blank" rel="noopener noreferrer" className="underline">Cosine Terrain Generator</Link> is a realtime 3D visualization that uses a cosine-based mathematical function to procedurally generate an infinite surface of
               rolling hills.  Numerous parameters in CosineTerrainCard can be adjusted to create a variety of terrain shapes and patterns.
-
             </p>
             <p className="text-lg leading-relaxed">
               This project was created with <Link href="https://github.com/manta-digital/manta-templates/" target="_blank" rel="noopener noreferrer" className="underline">manta-templates</Link> and the <Link href="https://github.com/ecorkran/ai-project-guide" target="_blank" rel="noopener noreferrer" className="underline">ai-project-guide</Link>.
@@ -29,12 +28,12 @@ const AboutPage: React.FC = () => {
             <h3 className="text-xl font-semibold mb-0 text-green-900 dark:text-green-200">
               Explore More Features & Create Your Own
             </h3>
-            <p className="text-green-900 dark:text-green-200 mb-4">
+            <p className="text-green-900 dark:text-green-200 mb-1">
               This template is part of a comprehensive collection of modern web components and layouts. 
               Discover advanced grid systems, interactive components, animation variants, and many more 
               examples in our full showcase.
             </p>
-            <p className="text-green-900 dark:text-green-200 mb-4">
+            <p className="text-green-900 dark:text-green-200 mb-1">
               Intelligence and guidance which enabled the creation of this project was provided by <Link href="https://github.com/ecorkran/ai-project-guide" target="_blank" rel="noopener noreferrer" className="underline">ai-project-guide</Link>.
               Both tools are open source and available on <Link href="https://github.com/manta-digital/manta-templates" target="_blank" rel="noopener noreferrer" className="underline">GitHub</Link>.
             </p>
@@ -53,12 +52,12 @@ pnpm run setup-guides`}</code>
               </pre>
             </div>
 
-                          <div className="mt-4 flex flex-wrap gap-4">
+              <div className="mt-4 flex flex-wrap gap-4">
                 <Link
                     href="https://github.com/ecorkran/lab-threejs-surface"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-900/40 dark:text-cyan-300 dark:border-cyan-700 rounded-full hover:bg-cyan-200 dark:hover:bg-cyan-900/60 transition-colors font-medium"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-900/40 dark:text-cyan-300 dark:border-cyan-700 rounded-full hover:bg-cyan-200 dark:hover:bg-cyan-900/60 transition-colors font-medium w-full sm:w-auto"
                   >
                     This Project on GitHub
                 </Link>
@@ -66,7 +65,7 @@ pnpm run setup-guides`}</code>
                   href="https://templates.manta.digital"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors font-medium"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors font-medium flex-1 sm:flex-initial"
                 >
                   Manta Templates
                 </Link>
@@ -74,7 +73,7 @@ pnpm run setup-guides`}</code>
                   href="https://github.com/ecorkran/ai-project-guide"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors font-medium"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors font-medium flex-1 sm:flex-initial"
                 >
                   AI Project Guide
                 </Link>

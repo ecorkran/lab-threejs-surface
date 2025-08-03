@@ -70,7 +70,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   terrainQuality = 2,
   enableDynamicTilesX = true,
   cameraFarPlane = 28000, // Increased far plane renders terrain farther out but may affect apparent width/frequency
-  showTerrainLogs = true,
+  showTerrainLogs = false,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 

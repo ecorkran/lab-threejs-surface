@@ -6,7 +6,7 @@ import Container from './container';
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-gray-100 dark:bg-gray-800 p-4 pl-1 pr-1 shadow-md">
+    <header className="bg-gray-100 dark:bg-gray-800 p-4 pl-1 pr-1 pb-1.5 shadow-md">
       <Container className="flex justify-between items-center">
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center space-x-2">
