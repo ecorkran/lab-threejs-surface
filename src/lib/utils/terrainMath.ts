@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+
 
 export interface TerrainConfig {
   frequency: number;

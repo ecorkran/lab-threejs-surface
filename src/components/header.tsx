@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import NavBar from './navbar';
 import Container from './container';
 
@@ -9,10 +10,12 @@ const Header: React.FC = () => {
       <Container className="flex justify-between items-center">
         {/* Left side - Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <img
+          <Image
             src="/assets/logo/logo-surface.png"
             alt="Cosine Terrain Logo"
-            className="w-20 h-auto rounded dark:border-1 dark:border-green-900"
+            width={80}
+            height={24}
+            className="rounded dark:border-1 dark:border-green-900"
           />
           <span className="text-md font-bold pl-3 leading-tight">Cosine Terrain</span>
         </Link>

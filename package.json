@@ -63,6 +63,7 @@
     "eslint": "^9.29.0",
     "eslint-config-next": "15.3.3",
     "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8.5.6",
     "prettier": "^3.5.3",
     "rehype-pretty-code": "^0.14.1",
