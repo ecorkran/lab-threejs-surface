@@ -15,6 +15,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' }, // Placeholder path
+  { href: 'https://github.com/ecorkran/lab-threejs-surface', label: 'GitHub' },
 ];
 
 const NavBar: React.FC = () => {
@@ -32,9 +33,11 @@ const NavBar: React.FC = () => {
         <Link
           key={item.href}
           href={item.href}
+          target={item.href.startsWith('http') ? '_blank' : undefined}
+          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
           className={cn(
-            'text-sm font-medium transition-colors hover:text-primary',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-1 py-0.5' // Basic focus styling
+            'text-sm font-medium transition-colors hover:text-blue-600',
+            'focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 rounded-full px-3 py-1.5' // Rounded pill style
           )}
         >
           {item.label}
