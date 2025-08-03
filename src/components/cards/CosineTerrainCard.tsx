@@ -47,7 +47,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   cameraHeight = 3600,
   terrainFrequency = 0.000113,
   terrainAmplitude = 2400,
-  meshResolution = 12,
+  meshResolution = 16,
   tilesX = 20,
   tilesZ = 65, // Increased to 65 to maintain consistent coverage span
   fov = 60,
@@ -118,6 +118,9 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
 
   useEffect(() => {
     if (!mountRef.current) return;
+    // Clear any existing canvas or children before mounting new renderer
+    mountRef.current.innerHTML = '';
+    let frameId: number;
 
     // Calculate actual tilesX to use (Step 3)
     const actualTilesX = enableDynamicTilesX 
@@ -390,7 +393,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
 
     let lastTime = performance.now();
     const animate = () => {
-      requestAnimationFrame(animate);
+      frameId = requestAnimationFrame(animate);
       const now = performance.now();
       const delta = (now - lastTime) / 1000;
       lastTime = now;
@@ -496,15 +499,23 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     animate();
 
     return () => {
+      // Stop the animation loop
+      cancelAnimationFrame(frameId);
       window.removeEventListener('resize', onWindowResize);
       if (mountRef.current) {
-        if (fpsElement) {
-          mountRef.current.removeChild(fpsElement);
-        }
-        mountRef.current.removeChild(renderer.domElement);
+        // Remove any existing canvas or FPS overlay
+        mountRef.current.innerHTML = '';
       }
+      // Dispose renderer and scene resources
+      renderer.dispose();
+      // Dispose each tile's geometry
+      terrainTiles.forEach(tile => {
+        tile.geometry.dispose();
+      });
+      // Dispose the single shared material
+      material.dispose();
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, enableDynamicTilesX, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality, cameraFarPlane, showTerrainLogs]);
+  }, []);
 
   return <div ref={mountRef} className={className} />;
 };

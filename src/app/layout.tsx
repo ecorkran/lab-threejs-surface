@@ -17,19 +17,19 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://templates.manta.dig
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'manta.digital NextJS Template',
-  description: 'Templates, layouts, and UI components created with the included AI Project Guides',
+  title: 'Infinite 3D Cosine Terrain Generator',
+  description: 'Realtime-generated 3D cosine surface terrain with 120fps smooth animations, extensive parameter configuration, and infinite terrain generation using Three.js.',
   openGraph: {
-    title: 'manta.digital NextJS Template',
-    description: 'Templates, layouts, and UI components created with the included AI Project Guides',
+    title: 'Infinite 3D Cosine Terrain Generator',
+    description: 'Realtime-generated 3D cosine surface terrain with 120fps smooth animations, extensive parameter configuration, and infinite terrain generation using Three.js.',
     url: '/',
-    siteName: 'manta.digital NextJS Template',
+    siteName: 'Infinite 3D Cosine Terrain Generator',
     images: [
       {
         url: 'https://templates.manta.digital/image/opengraph-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'manta.digital NextJS Template OG Image',
+        alt: 'Infinite 3D Cosine Terrain Generator OG Image',
       },
     ],
     locale: 'en_US',

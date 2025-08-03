@@ -1,13 +1,21 @@
 import React from 'react';
+import Link from 'next/link';
 import NavBar from './navbar';
 import Container from './container';
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-gray-100 dark:bg-gray-800 p-4 shadow-md">
+    <header className="bg-gray-100 dark:bg-gray-800 p-4 pl-1 pr-1 shadow-md">
       <Container className="flex justify-between items-center">
-        {/* Left side - Logo placeholder or similar could go here */}
-        <div>Logo Placeholder</div> 
+        {/* Left side - Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <img
+            src="/assets/logo/logo-surface.png"
+            alt="Cosine Terrain Logo"
+            className="w-20 h-auto rounded dark:border-1 dark:border-green-900"
+          />
+          <span className="text-md font-bold pl-3 leading-tight">Cosine Terrain</span>
+        </Link>
         
         {/* Right side - Navigation */}
         <NavBar />

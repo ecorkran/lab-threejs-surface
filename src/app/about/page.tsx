@@ -2,51 +2,84 @@ import React from 'react';
 import Link from 'next/link';
 import { BaseCard } from '@/components/cards';
 import Container from '@/components/container';
+import Layout from '@/components/layout';
 
 const AboutPage: React.FC = () => {
   return (
-    <Container className="py-16">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">About This Template</h1>
-        </div>
+    <Layout>
+      <Container className="py-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">About the Cosine Terrain Generator</h1>
+          </div>
 
         <div className="space-y-8">
           <div className="prose prose-lg max-w-none dark:prose-invert">
             <p className="text-lg leading-relaxed">
-              This is a modern Next.js starter template provided by Manta Templates. It features 
-              a clean, professional design with essential components and layouts to help you build 
-              your next project quickly and efficiently.
+              The Cosine Terrain Generator is a realtime 3D visualization that uses a cosine-based mathematical function to procedurally generate an infinite surface of
+              rolling hills.  Numerous parameters in CosineTerrainCard can be adjusted to create a variety of terrain shapes and patterns.
+
             </p>
-            
             <p className="text-lg leading-relaxed">
-              The template includes blog functionality, portfolio layouts, grid systems, and a 
-              comprehensive theming system built with Tailwind CSS and Radix UI components.
+              This project was created with <Link href="https://github.com/manta-digital/manta-templates/" target="_blank" rel="noopener noreferrer" className="underline">manta-templates</Link> and the <Link href="https://github.com/ecorkran/ai-project-guide" target="_blank" rel="noopener noreferrer" className="underline">ai-project-guide</Link>.
             </p>
           </div>
 
-          <BaseCard className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
-            <h3 className="text-xl font-semibold mb-4 text-blue-900 dark:text-blue-100">
-              Explore More Features
+          <BaseCard className="p-6 bg-gradient-to-br from-green-50 to-green-200 dark:from-green-950/20 dark:to-green-800/20">
+            <h3 className="text-xl font-semibold mb-0 text-green-900 dark:text-green-200">
+              Explore More Features & Create Your Own
             </h3>
-            <p className="text-blue-800 dark:text-blue-200 mb-4">
+            <p className="text-green-900 dark:text-green-200 mb-4">
               This template is part of a comprehensive collection of modern web components and layouts. 
               Discover advanced grid systems, interactive components, animation variants, and many more 
               examples in our full showcase.
             </p>
-            <Link 
-              href="https://templates.manta.digital" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-            >
-              Visit Full Showcase →
-            </Link>
+            <p className="text-green-900 dark:text-green-200 mb-4">
+              Intelligence and guidance which enabled the creation of this project was provided by <Link href="https://github.com/ecorkran/ai-project-guide" target="_blank" rel="noopener noreferrer" className="underline">ai-project-guide</Link>.
+              Both tools are open source and available on <Link href="https://github.com/manta-digital/manta-templates" target="_blank" rel="noopener noreferrer" className="underline">GitHub</Link>.
+            </p>
+
+            <p className="pb-0 mb-0 text-green-900 dark:text-green-200">Create your own:</p>
+            <div className="p-4 pt-0 pb-0 border bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <pre className="m-4 text-sm text-green-700 dark:text-green-300 overflow-x-auto">
+                <code>{`# Pull template instance:
+pnpm dlx degit manta-digital/manta-templates/templates/nextjs my-app
+
+# Install dependencies:
+cd my-app && pnpm install
+
+# Setup guides:
+pnpm run setup-guides`}</code>
+              </pre>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-4">
+              <Link
+                href="https://templates.manta.digital"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-green-600 border-1 border-green-100 dark:border-green-500 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
+              >
+                Visit Full Showcase →
+              </Link>
+              <Link
+                href="https://github.com/ecorkran/ai-project-guide"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-green-600 border-1 border-green-100 dark:border-green-500 text-white rounded-md hover:bg-green-700 transition-colors font-medium"
+              >
+                AI Project Guide →
+              </Link>
+            </div>
           </BaseCard>
 
           <BaseCard className="p-6 bg-muted/50">
-            <h3 className="text-xl font-semibold mb-4">Template Features</h3>
+            <h3 className="text-xl font-semibold">Template Features</h3>
             <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-center">
+                <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
+                Three.js support included
+              </li>
               <li className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
                 Modern Next.js 15 with App Router
@@ -67,10 +100,6 @@ const AboutPage: React.FC = () => {
                 <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
                 Dark/light mode support
               </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                Blog and portfolio examples
-              </li>
             </ul>
           </BaseCard>
 
@@ -83,6 +112,7 @@ const AboutPage: React.FC = () => {
         </div>
       </div>
     </Container>
+    </Layout>
   );
 };
 

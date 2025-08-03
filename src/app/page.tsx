@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero */}
-      <Container className="pt-20 pb-10 text-center space-y-4">
-        <h1 className="text-5xl font-bold">3D Cosine Terrain Demo</h1>
+      <Container className="pt-12 pb-10 text-center space-y-4">
+        <h1 className="text-5xl font-bold">3D Cosine Terrain Generator</h1>
         <p className="text-muted-foreground text-lg">
           Experience an infinite cosine surface rendered in retro wireframe.
         </p>
