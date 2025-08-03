@@ -1,162 +1,93 @@
-# Manta Next 15 × Tailwind 4 × ShadCN Template
+# Infinite 3D Cosine Terrain Generator
 
-> A **clean**, production-ready starter that lets you ship beautiful, content-driven sites **fast**.
+> A realtime 3D visualization that procedurally generates infinite rolling terrain using cosine-based mathematical functions, built with Three.js and Next.js.
 
 ---
 
-## 🚀 Quick Start
+## 🌊 What is this?
+The Cosine Terrain Generator creates an infinite, animated 3D landscape in your browser using mathematical cosine functions. Unlike pre-recorded videos, every frame is calculated and rendered in realtime, creating smooth 120fps animations of rolling hills that extend infinitely in all directions. The terrain adapts dynamically to your device screen size.  Look for controls you can experiment with soon!
 
+---
+
+## 🛠 How was it made?
+This project was built using two powerful development tools:
+- **[manta-templates](https://github.com/manta-digital/manta-templates)** - A modern Next.js template with Tailwind CSS, ShadCN UI, and Three.js support
+- **[ai-project-guide](https://github.com/ecorkran/ai-project-guide)** - AI-assisted development methodology that guided the project architecture and implementation
+
+The combination enabled rapid prototyping and iterative development of complex 3D mathematics and rendering optimizations.
+
+---
+
+## 🚀 Developer Quick Start
 ```bash
-# Recommended: Install pnpm (one-time setup)
-npm install -g pnpm
-
-# Create your project from the template
-pnpm dlx degit manta-digital/manta-templates/templates/nextjs my-project
-cd my-project
+# Clone the repository
+git clone https://github.com/ecorkran/lab-threejs-surface.git
+cd lab-threejs-surface
 
 # Install dependencies
 pnpm install
 
-# Set up project guides (optional)
-pnpm setup-guides
-
-# Start development
+# Start development server
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) - you'll see a minimal starter with sample content.
+Open [http://localhost:3000](http://localhost:3000) to see the terrain generator in action.
 
 ---
 
 ## ✨ Features
 
-| Stack | What you get out-of-the-box |
-|-------|----------------------------|
-| **Next.js 15** (App Router) | Strict TS, Turbopack dev server, optimized images |
-| **Tailwind CSS v4** | Dark/Light mode, no config files needed |
-| **ShadCN UI + Radix** | Pre-wired, accessible components |
-| **Layout Components** | Flexible grid system with examples |
-| **Markdown Content** | Gray-matter frontmatter, code highlighting |
-| **Clean Structure** | Minimal examples, ready for your content |
+- **Realtime 3D Rendering** - Every frame calculated live using Three.js
+- **Infinite Terrain** - Seamless, endless landscape generation
+- **Responsive Design** - Adapts to any screen size and orientation
+- **120fps Performance** - Smooth animations on modern devices
+- **Mathematical Precision** - Cosine-based algorithms for natural terrain shapes
+- **Dark/Light Mode** - Full theme support with system preference detection
 
 ---
 
-## 📁 Project Structure
+## 🎯 Technical Details
 
-```
-src/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable React components
-├── content/            # Your markdown content (replace samples)
-├── lib/                # Utilities and shared logic
-└── types/              # TypeScript type definitions
+*[Placeholder for detailed technical information]*
 
-examples/
-├── sample-content/     # Sample markdown files (replace these)
-└── our-project/        # Your project docs (populated by setup-guides)
+### Terrain Generation Algorithm
+*Coming soon - detailed explanation of the cosine-based terrain mathematics*
 
-project-documents/      # AI project guides (run setup-guides)
-```
+### Performance Optimizations  
+*Coming soon - tile management, geometry recycling, and rendering techniques*
+
+### Responsive Tile Calculation
+*Coming soon - aspect ratio-based tile count optimization*
 
 ---
 
-## 🎯 Getting Started
+## 📱 FAQ
 
-### 1. Replace Sample Content
-The template includes minimal sample content in `src/content/` and `examples/sample-content/`:
+### How did you make the video for this site?
+It's not a video! The terrain is being generated in realtime based on mathematical formulas. Every frame you see is calculated and rendered live in your browser using WebGL and Three.js.
 
-- `quotes/sample-quote.md` - Example quote card
-- `projects/sample-project.md` - Example project showcase
-
-Replace these with your own content following the same frontmatter structure.
-
-### 2. Set Up Project Guides (Optional)
-If you want to use AI-assisted development workflows:
-
-```bash
-pnpm setup-guides
-```
-
-This populates `project-documents/` with comprehensive guides for AI-assisted development and enables version control for your project-specific documents. You can safely run this command multiple times.
-
-### 3. Customize Your Site
-- Update `src/app/page.tsx` with your homepage content
-- Modify components in `src/components/` 
-- Add your content to `src/content/`
-- Customize themes in `src/app/globals.css`
-
----
-
-## 🛠 Available Scripts
-
-```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production  
-pnpm start        # Start production server
-pnpm lint         # Run ESLint
-pnpm setup-guides # Set up AI project guides
-```
-
----
-
-## 🎨 Content System
-
-The template includes a flexible content system for markdown files:
-
-### Quote Cards
-```yaml
----
-author: "Your Name"
-quote: "Your inspiring quote here"
-featured: true
----
-```
-
-### Project Showcases  
-```yaml
----
-title: "Project Name"
-description: "Brief description"
-techStack: ["Next.js", "TypeScript"]
-repoUrl: "https://github.com/..."
----
-```
-
-### Blog Posts
-```yaml
----
-title: "Post Title"
-pubDate: "2024-01-01"
-description: "Post description"
----
-```
+### Does it work on mobile devices?
+Yes! The terrain generator automatically adjusts the number of tiles and mesh resolution based on your device capabilities and screen size for optimal performance.
 
 ---
 
 ## 🚀 Deployment
 
-This template works with any Next.js hosting provider:
+This project is deployed on Vercel and can be viewed at: [https://terrain.erikcorkran.com](https://terrain.erikcorkran.com)
 
-- **Vercel**: `git push` to deploy automatically
-- **Netlify**: Connect your repository for auto-deploys
-- **Docker**: `pnpm build` then containerize the output
+To deploy your own instance:
+```bash
+# Build for production
+pnpm build
 
----
-
-## 📚 Documentation
-
-After running `pnpm setup-guides`, you'll have access to comprehensive documentation including:
-
-- AI-assisted development workflows
-- Component architecture guides  
-- Best practices and patterns
-- Advanced customization examples
+# Deploy to your preferred platform (Vercel, Netlify, etc.)
+```
 
 ---
 
 ## 🤝 Contributing
 
-This template is part of the [Manta Templates](https://github.com/manta-digital/manta-templates) monorepo. Contributions welcome!
+Contributions are welcome! This project demonstrates advanced Three.js techniques and mathematical terrain generation - perfect for learning or extending.
 
 ---
 

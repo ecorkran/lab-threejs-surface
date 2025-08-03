@@ -52,7 +52,7 @@ pnpm run setup-guides`}</code>
               </pre>
             </div>
 
-              <div className="mt-4 flex flex-wrap gap-4">
+              <div className="mt-4 flex flex-col sm:flex-row flex-wrap gap-3">
                 <Link
                     href="https://github.com/ecorkran/lab-threejs-surface"
                     target="_blank"
@@ -65,7 +65,7 @@ pnpm run setup-guides`}</code>
                   href="https://templates.manta.digital"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors font-medium flex-1 sm:flex-initial"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-purple-100 text-purple-800 border border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors font-medium w-full sm:w-auto"
                 >
                   Manta Templates
                 </Link>
@@ -73,7 +73,7 @@ pnpm run setup-guides`}</code>
                   href="https://github.com/ecorkran/ai-project-guide"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors font-medium flex-1 sm:flex-initial"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition-colors font-medium w-full sm:w-auto"
                 >
                   AI Project Guide
                 </Link>
