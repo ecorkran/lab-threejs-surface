@@ -60,6 +60,7 @@ export default function RootLayout({
             })();`,
           }}
         />
+        <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200 ease-in-out`}
