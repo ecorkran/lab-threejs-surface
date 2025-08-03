@@ -35,6 +35,9 @@ interface CosineTerrainCardProps {
   terrainQuality?: 0 | 1 | 2;
   // Dynamic tile count
   enableDynamicTilesX?: boolean;
+  // Camera and rendering
+  cameraFarPlane?: number; // Distance for far clipping plane - higher values render terrain farther out
+  showTerrainLogs?: boolean; // Show 5-second terrain coverage progress logs
 }
 
 const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
@@ -42,11 +45,11 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   seed = 0,
   speed = 2400,
   cameraHeight = 3600,
-  terrainFrequency = 0.000153,
+  terrainFrequency = 0.000113,
   terrainAmplitude = 2400,
   meshResolution = 12,
   tilesX = 20,
-  tilesZ = 32,
+  tilesZ = 65, // Increased to 65 to maintain consistent coverage span
   fov = 60,
   terrainScale = 2048,
   terrainEquation = 'multiplicative',
@@ -55,7 +58,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   zAmplitudeMultiplier = 1.0,
   // Spatial variation settings
   enableAmplitudeVariation = true,
-  amplitudeVariationFrequency = 0.000273, // low freq for fairly large-scale features
+  amplitudeVariationFrequency = 0.000233, // low freq for fairly large-scale features
   amplitudeVariationIntensity = 1.73, // Can vary amplitude by ±173%
   showFPS = true,
   // Enhanced camera system props with appropriate defaults
@@ -66,18 +69,19 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   heightVariationFrequency = 0.25,
   terrainQuality = 2,
   enableDynamicTilesX = true,
+  cameraFarPlane = 28000, // Increased far plane renders terrain farther out but may affect apparent width/frequency
+  showTerrainLogs = false,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   // Tile management constants (maintainability)
-  const TILE_RECYCLING_THRESHOLD = 1.5; // How far behind camera before recycling (in tile units) - increased to prevent premature clipping
+  const TILE_RECYCLING_THRESHOLD = 3.5; // Enable recycling - more conservative to prevent premature recycling
   const TILE_BUFFER_DISTANCE = 1.5; // Extra tiles to keep in front of camera (in tile units)
-  const GAP_DETECTION_ENABLED = true; // Enable gap detection and emergency tile creation
-  const MAX_TILES_PER_FRAME_RECYCLE = 2; // Limit recycling operations per frame for performance
+  const GAP_DETECTION_ENABLED = false; // Disabled - causes issues with emergency tile placement
+  const MAX_TILES_PER_FRAME_RECYCLE = 5; // Increased to handle more recycling per frame
   
   // Dynamic tile calculation constants
-  const TILE_BUFFER_COUNT = 10; // Extra tiles for safety margin (wider coverage for distance viewing)
-  const MINIMUM_TILES_X = 8; // Minimum horizontal tiles regardless of viewport
+  const MINIMUM_TILES_X = 10; // Minimum horizontal tiles regardless of viewport
   
   /**
    * Calculate optimal horizontal tile count based on viewport and camera settings
@@ -85,7 +89,12 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   const calculateOptimalTilesX = (viewportWidth: number): number => {
     const viewWidth = 2 * Math.tan((fov * Math.PI / 180) / 2) * cameraHeight;
     const tilesNeeded = Math.ceil(viewWidth / terrainScale);
-    return Math.max(tilesNeeded + TILE_BUFFER_COUNT, MINIMUM_TILES_X);
+    
+    // Scale buffer with window width: 8 for narrow, ~12 for typical, ~20+ for very wide
+    // Base buffer of 8, plus 1 extra tile per ~200px of width
+    const widthBasedBuffer = MINIMUM_TILES_X + Math.floor(viewportWidth / 100);
+    
+    return Math.max(tilesNeeded + widthBasedBuffer, MINIMUM_TILES_X);
   };
   
   // Frequency validation for gap prevention
@@ -115,10 +124,10 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       ? calculateOptimalTilesX(mountRef.current.clientWidth)
       : tilesX;
 
-    const cameraFarPlane = 20000;
+    const cameraNearPlane = 0.1; // Reduced near plane to prevent premature clipping
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(fov, mountRef.current.clientWidth / mountRef.current.clientHeight, 1, cameraFarPlane);
+    const camera = new THREE.PerspectiveCamera(fov, mountRef.current.clientWidth / mountRef.current.clientHeight, cameraNearPlane, cameraFarPlane);
     camera.position.y = cameraHeight;
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     
@@ -251,11 +260,16 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       
       positions.needsUpdate = true;
       geometry.computeVertexNormals();
+      
+      // Force complete geometry refresh to fix rendering issues with recycled tiles
+      geometry.attributes.position.needsUpdate = true;
+      geometry.computeBoundingBox();
+      geometry.computeBoundingSphere();
     };
 
     for (let i = 0; i < actualTilesX; i++) {
       for (let j = 0; j < tilesZ; j++) {
-        terrainTiles.push(generateTerrainTile(i - Math.floor(actualTilesX / 2), j - Math.floor(tilesZ / 2)));
+        terrainTiles.push(generateTerrainTile(i - Math.floor(actualTilesX / 2), j - tilesZ));
       }
     }
 
@@ -429,27 +443,45 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       // Quality-based tile recycling system with gap prevention
       let recycledThisFrame = 0;
       
+      // Optional terrain progress logging every 5 seconds
+      if (showTerrainLogs) {
+        const shouldLog = Math.floor(now / 5000) !== Math.floor((now - delta * 1000) / 5000);
+        if (shouldLog) {
+          const timeSeconds = Math.floor(now / 1000);
+          const cameraZTile = Math.round(camera.position.z / terrainScale);
+          
+          // Show terrain coverage
+          const allTileZ = terrainTiles.map(t => Math.round(t.position.z / terrainScale));
+          const minZ = Math.min(...allTileZ);
+          const maxZ = Math.max(...allTileZ);
+          
+          console.log(`T=${timeSeconds}s: Camera Z=${camera.position.z.toFixed(0)} (tile ${cameraZTile}), Tiles: ${terrainTiles.length}`);
+          console.log(`  Terrain coverage: tiles ${minZ} to ${maxZ} (span: ${maxZ - minZ + 1} tiles)`);
+        }
+      }
+      
       terrainTiles.forEach(tile => {
         // Limit recycling operations per frame for performance
         if (recycledThisFrame >= MAX_TILES_PER_FRAME_RECYCLE) return;
         
         // Recycle tiles that are well behind the camera
         const recycleThreshold = terrainScale * TILE_RECYCLING_THRESHOLD;
-        const distanceBehindCamera = tile.position.z - camera.position.z;
+        const distanceBehindCamera = tile.position.z - camera.position.z; // Tile behind when tile.z > camera.z
         
         if (distanceBehindCamera > recycleThreshold) {
           // Move tile forward by the full terrain depth to maintain grid structure
           const newTileZ = tile.position.z - (terrainScale * tilesZ);
           
-
+          // Recycling and regeneration working correctly
           
-          tile.position.z = newTileZ;
+          // Update mesh position to match new coordinates
+          const tileX = tile.position.x / terrainScale; // Keep existing X coordinate  
+          const tileZ = newTileZ / terrainScale; // New Z coordinate
+          tile.position.set(tileX * terrainScale, 0, tileZ * terrainScale);
           recycledThisFrame++;
           
           // Quality 2: Regenerate geometry for true continuous terrain
           if (terrainQuality >= 2) {
-            const tileX = tile.position.x / terrainScale; // Keep existing X coordinate
-            const tileZ = newTileZ / terrainScale; // Use new Z coordinate
             regenerateTileGeometry(tile, tileX, tileZ);
           }
         }
@@ -472,7 +504,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, enableDynamicTilesX, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality]);
+  }, [seed, speed, cameraHeight, terrainFrequency, terrainAmplitude, meshResolution, tilesX, tilesZ, fov, terrainScale, terrainEquation, xAmplitudeMultiplier, zAmplitudeMultiplier, enableAmplitudeVariation, amplitudeVariationFrequency, amplitudeVariationIntensity, enableDynamicTilesX, showFPS, followTerrain, lookAheadDistance, lookAtHeight, heightVariation, heightVariationFrequency, terrainQuality, cameraFarPlane, showTerrainLogs]);
 
   return <div ref={mountRef} className={className} />;
 };
