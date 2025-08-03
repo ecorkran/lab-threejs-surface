@@ -499,12 +499,16 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
     animate();
 
     return () => {
-      // Stop the animation loop
+      // Stop the animation loop - this prevents the old loop from continuing to render
+      // after component unmount, which was causing the "double surface" issue
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', onWindowResize);
-      if (mountRef.current) {
+      // Capture ref value to avoid ESLint warning about ref changing during cleanup
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const currentMountRef = mountRef.current;
+      if (currentMountRef) {
         // Remove any existing canvas or FPS overlay
-        mountRef.current.innerHTML = '';
+        currentMountRef.innerHTML = '';
       }
       // Dispose renderer and scene resources
       renderer.dispose();
@@ -515,6 +519,9 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
       // Dispose the single shared material
       material.dispose();
     };
+  // Note: Empty dependency array is intentional - we want this effect to run only on mount/unmount
+  // to prevent the "double surface" issue when navigating between pages
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <div ref={mountRef} className={className} />;
