@@ -70,7 +70,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   terrainQuality = 2,
   enableDynamicTilesX = true,
   cameraFarPlane = 28000, // Increased far plane renders terrain farther out but may affect apparent width/frequency
-  showTerrainLogs = false,
+  showTerrainLogs = true,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -80,21 +80,34 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
   const GAP_DETECTION_ENABLED = false; // Disabled - causes issues with emergency tile placement
   const MAX_TILES_PER_FRAME_RECYCLE = 5; // Increased to handle more recycling per frame
   
-  // Dynamic tile calculation constants
-  const MINIMUM_TILES_X = 10; // Minimum horizontal tiles regardless of viewport
-  
   /**
    * Calculate optimal horizontal tile count based on viewport and camera settings
    */
-  const calculateOptimalTilesX = (viewportWidth: number): number => {
-    const viewWidth = 2 * Math.tan((fov * Math.PI / 180) / 2) * cameraHeight;
-    const tilesNeeded = Math.ceil(viewWidth / terrainScale);
+  const calculateOptimalTilesX = (viewportWidth: number, viewportHeight: number): number => {
+    const viewWidth = 2 * Math.tan((fov * Math.PI / 180) / 2) * cameraFarPlane;
+    const baselineTiles = Math.ceil(viewWidth / terrainScale);
     
-    // Scale buffer with window width: 8 for narrow, ~12 for typical, ~20+ for very wide
-    // Base buffer of 8, plus 1 extra tile per ~200px of width
-    const widthBasedBuffer = MINIMUM_TILES_X + Math.floor(viewportWidth / 100);
+    // Aspect ratio adjustment: square viewport (1:1) = no adjustment
+    const aspectRatio = viewportWidth / viewportHeight;
+    const aspectAdjustedTiles = Math.round(baselineTiles * aspectRatio);
+    const finalTileCount = aspectAdjustedTiles;
     
-    return Math.max(tilesNeeded + widthBasedBuffer, MINIMUM_TILES_X);
+    // Debug output for tile calculations
+    if (showTerrainLogs) {
+      console.log('🔧 Tile Calculation Debug:', {
+        viewportSize: `${viewportWidth}×${viewportHeight}px`,
+        aspectRatio: aspectRatio.toFixed(2),
+        fov: `${fov}°`,
+        cameraFarPlane: cameraFarPlane,
+        terrainScale: terrainScale,
+        viewWidth: `${viewWidth.toFixed(0)} world units`,
+        baselineTiles: `${baselineTiles} tiles (geometric baseline)`,
+        aspectAdjustedTiles: `${aspectAdjustedTiles} tiles (after aspect)`,
+        finalTileCount: `${finalTileCount} tiles`
+      });
+    }
+    
+    return finalTileCount;
   };
   
   // Frequency validation for gap prevention
@@ -124,7 +137,7 @@ const CosineTerrainCard: React.FC<CosineTerrainCardProps> = ({
 
     // Calculate actual tilesX to use (Step 3)
     const actualTilesX = enableDynamicTilesX 
-      ? calculateOptimalTilesX(mountRef.current.clientWidth)
+      ? calculateOptimalTilesX(mountRef.current.clientWidth, mountRef.current.clientHeight)
       : tilesX;
 
     const cameraNearPlane = 0.1; // Reduced near plane to prevent premature clipping

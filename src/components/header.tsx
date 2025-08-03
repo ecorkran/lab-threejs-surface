@@ -17,7 +17,7 @@ const Header: React.FC = () => {
             height={24}
             className="rounded dark:border-1 dark:border-green-900"
           />
-          <span className="text-md font-bold pl-3 leading-tight">Cosine Terrain</span>
+          <span className="hidden sm:inline text-md font-bold pl-3 leading-tight">Cosine Terrain</span>
         </Link>
         
         {/* Right side - Navigation */}
