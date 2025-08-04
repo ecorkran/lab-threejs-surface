@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://templates.manta.digital';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://terrain.erikcorkran.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
