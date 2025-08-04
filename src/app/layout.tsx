@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: 'Infinite 3D Cosine Terrain Generator',
     images: [
       {
-        url: '/image/opengraph-image.jpg',
+        url: '/image/opengraph-image.jpg?v=2',
         width: 1200,
         height: 630,
         alt: 'Infinite 3D Cosine Terrain Generator OG Image',
