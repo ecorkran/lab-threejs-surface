@@ -26,8 +26,8 @@ const AboutPage: React.FC = () => {
               Explore More Features & Create Your Own
             </h3>
             <p className="text-green-900 dark:text-green-200 mb-1">
-              This project was created from the manta-templates Next.js template.  It's part of a new collection of web components
-              and layouts.  It's card-based, with grids that actually work, 3D with Three.js, Radix themes, videos, and more. 
+              This project was created from the manta-templates Next.js template.  It&apos;s part of a new collection of web components
+              and layouts.  It&apos;s card-based, with grids that actually work, 3D with Three.js, Radix themes, videos, and more. 
             </p>
             <p className="text-green-900 dark:text-green-200 mb-1">
               Intelligence and guidance which enabled the creation of this project was provided by <Link href="https://github.com/ecorkran/ai-project-guide" target="_blank" rel="noopener noreferrer" className="underline">ai-project-guide</Link>.
@@ -85,7 +85,7 @@ pnpm run setup-guides`}</code>
               To make a three-dimensional surface, we use a mathematical function to determine the height at any point 
               in our world.  We call the left-right direction X, and the direction into and out of your screen Z.  You
               can imagine that these create a flat grid extending into your screen.  At each point where lines cross, we
-              apply our mathematical function to calculate the height of that point.  We create a 'mesh' of lines using 
+              apply our mathematical function to calculate the height of that point.  We create a &apos;mesh&apos; of lines using 
               these heights which gives us a three-dimensional surface.  The lines you see are the outline of the mesh.
             </p>
             <p className="mb-1">
