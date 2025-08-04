@@ -21,6 +21,29 @@ const AboutPage: React.FC = () => {
             </p>
           </div>
 
+          <BaseCard className="p-6 bg-cyan-100/50 dark:bg-cyan-950/30 text-cyan-900 dark:text-cyan-200">
+            <h3 className="text-xl font-semibold text-cyan-900 dark:text-cyan-300">How Does It Work?</h3>
+            <p className="mb-1">
+              We generate the terrain in a simulated world, defined in three dimensions just like our physical world. 
+            </p>
+            <p className="mb-1">
+              To make a three-dimensional surface, we use a mathematical function to determine the height at any point 
+              in our world.  We call the left-right direction X, and the direction into and out of your screen Z.  You
+              can imagine that these create a flat grid extending into your screen.  At each point where lines cross, we
+              apply our mathematical function to calculate the height of that point.  We create a &apos;mesh&apos; of lines using 
+              these heights which gives us a three-dimensional surface.  The lines you see are the outline of the mesh.
+            </p>
+            <p className="mb-1">
+              The function we apply by default is y = cos(x) + cos(z).  We further modify the function to y = a*cos(ix) + b*cos(jy).
+              It looks worse but is similar.  Increasing i or j increases the frequency (causes faster waves) in its respective
+              direction.  Increasing a or b increases the size of the waves in that direction.   
+            </p>
+            <p className="mb-1">
+              By continuously calculating these heights and updating the mesh in realtime, we create the smooth, infinite 
+              terrain animation you see - all running at 60-120fps in your browser.              
+            </p>
+          </BaseCard>
+
           <BaseCard className="p-6 bg-gradient-to-br from-green-50 to-green-200 dark:from-green-950/20 dark:to-green-800/20">
             <h3 className="text-xl font-semibold mb-0 text-green-900 dark:text-green-200">
               Explore More Features & Create Your Own
@@ -74,29 +97,6 @@ pnpm run setup-guides`}</code>
                   AI Project Guide
                 </Link>
               </div>
-          </BaseCard>
-
-          <BaseCard className="p-6 bg-cyan-100/50 dark:bg-cyan-950/30 text-cyan-900 dark:text-cyan-200">
-            <h3 className="text-xl font-semibold text-cyan-900 dark:text-cyan-300">How Does It Work?</h3>
-            <p className="mb-1">
-              We generate the terrain in a simulated world, defined in three dimensions just like our physical world. 
-            </p>
-            <p className="mb-1">
-              To make a three-dimensional surface, we use a mathematical function to determine the height at any point 
-              in our world.  We call the left-right direction X, and the direction into and out of your screen Z.  You
-              can imagine that these create a flat grid extending into your screen.  At each point where lines cross, we
-              apply our mathematical function to calculate the height of that point.  We create a &apos;mesh&apos; of lines using 
-              these heights which gives us a three-dimensional surface.  The lines you see are the outline of the mesh.
-            </p>
-            <p className="mb-1">
-              The function we apply by default is y = cos(x) + cos(z).  We further modify the function to y = a*cos(ix) + b*cos(jy).
-              It looks worse but is similar.  Increasing i or j increases the frequency (causes faster waves) in its respective
-              direction.  Increasing a or b increases the size of the waves in that direction.   
-            </p>
-            <p className="mb-1">
-              By continuously calculating these heights and updating the mesh in realtime, we create the smooth, infinite 
-              terrain animation you see - all running at 60-120fps in your browser.              
-            </p>
           </BaseCard>
         </div>
       </div>
